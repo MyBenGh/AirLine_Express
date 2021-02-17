@@ -1,0 +1,66 @@
+<%- include ('../partials/header') %>
+
+<div class="">
+	<img src="Images_Appli/logo.PNG" alt="Logo de l'application" style = "margin-left:auto;margin-right:auto">
+</div>
+<br>
+
+<div class="">
+		<table style="background-color:Blue;color:White;font-size:30px;width:80%;height:70px;margin-left:auto;margin-right:auto">
+            <tr>
+                <th style="text-decoration:underline">Accueil</th>
+                <th>Réservation</th>
+                <th>Compte</th>
+				<th>Nous Joindre</th>
+            </tr>
+		</table>
+	</div>
+<br>
+
+<div class="">
+	<div class="col s12">
+        <% 
+        if (items.length>0) {%>
+
+		    <h1 style="text-align:center;color:Blue"><strong> Liste des vols offerts par Airline Express </strong></h1>
+		    
+			<table class="table" style="text-align:center;margin-left:auto;margin-right:auto;width:80%">
+				<thead>
+				<tr>
+					<th style="width:2%;font-size:25px;height:70px">ID </th>
+					<th style="width:40%;font-size:25px;height:70px">Dates des vols</th>
+					<th style="width:10%;font-size:25px;height:70px">Sieges</th>
+					<th style="width:10%;font-size:25px;height:70px">Pays de départ</th>
+					<th style="width:15%;font-size:25px;height:70px">Pays de destination</th>
+				</tr>
+				</thead>
+				<tbody>
+                    
+                    <% items.forEach(function(item,index){ %>
+                        <tr>
+                        <td style="width:2%;font-size:20px"><%= index+1 %> </td>
+                        <td style="width:40%;font-size:20px"><%= item.date_vol %></td>
+                        <td style="width:10%;font-size:20px"><%= item.num_siege %></td>
+						<td style="width:10%;font-size:20px;text-align:left"><%= item.pays_origine %></td>
+						<td style="width:15%;font-size:20px;text-align:left"><%= item.pays_destination %></td>
+                        </td>
+                    </tr>
+                    <%}); %>
+				</tbody>
+
+			</table>
+		<% }else {%>
+			<p><strong> Non disponible </strong></p>
+		<% } %>
+		</div>
+		<br>
+
+		<p style = "width:50%;margin-left:auto;margin-right:auto">
+	        <a href="/" class="btn btn-success btn-lg" style="background-color:Yellow;color:Black;font-size:30px;float:left"> Retourner à l'accueil </a>
+		    <a href="/Reservation" class="btn btn-success btn-lg" style="background-color:Yellow;color:Black;font-size:30px;float:right"> Reserver ici </a>
+	    </p>
+	<div>
+</div>
+<br>
+
+<%- include ('../partials/footer') %>
