@@ -18,6 +18,8 @@
 <br>
 <br>
 
+<a href="/Compte/Deconnexion" class="liaison_pages">Deconnexion</a>
+
 
 <form action="http://localhost:5000/Reservation/Reserver" method="post" class="col s12">
     <label for="pays_origine" class ="col-2 col-form-label"> Pays de départ </label>
@@ -58,7 +60,7 @@
 						    <td style="width:10%;font-size:20px;text-align:left"><%= item.pays_origine %></td>
 						    <td style="width:15%;font-size:20px;text-align:left"><%= item.pays_destination %></td>
 						    <td style="width:10%;font-size:20px"><%= item.prix %>$</td>
-                            <td><a href="/Reservation/Facturation/<%= item._id %>" class="btn btn-danger">Reserver </a></td>
+                            <td><a href="/Reservation/Facture/<%= item._id %>" class="btn btn-danger">Reserver </a></td>
                         </tr>
                     <%}); %>
 				</tbody>

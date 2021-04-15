@@ -18,7 +18,9 @@
 <br>
 
 
-<div class="">
+<form action="http://localhost:5000/Reservation/Facture/<%= items[0]._id %>" method="post" class="col s12">
+
+     <div class="">
 	<div class="col s12">
         <% 
         if (items.length>0) {%>
@@ -48,23 +50,27 @@
                         </tr>
                         <tr>
                             <th style="width:10%;font-size:25px;height:70px">Prix</th>
-                            <td style="width:10%;font-size:20px"><%= item.Prix %>$</td>
+                            <td style="width:10%;font-size:20px"><%= item.prix %>$</td>
                         </tr>
 
-                        
+                        <tr>
+                            
+                        </tr>
             
 
                     <%}); %>
 				</tbody>
 			</table>
 
-            <a  href="/" class="liaison_pages" style = "float:center;"> Payer la réservation  </a>
+            <button class="valider" style=" border-radius: 12px; ">Payer la réservation</button>
 
 		<% }else {%>
-			<p><strong> Pays d'origine ou pays de destination incorrect </strong></p>
-            <a href="/Reservation/Reserver/" class="liaison_pages">Recommencer! </a>
+			<p><strong> Pays d'origine et/ou pays de destination incorrect </strong></p>
+            <a href="/Reservation/Reserver" class="liaison_pages">Recommencer! </a>
 		<% } %>
 	</div>
-<div/>	
+    <div/>                       
+                            
+</form>
 
 <%- include ('../partials/footer') %>
