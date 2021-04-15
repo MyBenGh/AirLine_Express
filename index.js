@@ -12,12 +12,11 @@ var con = require('mysql');
 //var path = require('path');
 const app = express();
 const siteTitle = "Airline Express";
-var url = "mongodb://localhost:28017/";
+var url = "mongodb://localhost:27017/";
 const URLbase = "http://localhost:5000/";
-var db = monk('localhost:28017/db_airline_express');
+var db = monk('localhost:27017/db_airline_express');
 const URLcpt = "http://localhost:5000/compte/creercompte/";
 const URLreservation = "http://localhost:5000/Reservation/Reserver";
-
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -43,7 +42,7 @@ app.use(express.static(__dirname + "/public"));
 //Permet d'afficher les messages d'allerte
 // Avant, installer: npm i alert
 const alert = require('alert');
-const { debug } = require('console');
+const { debug, Console } = require('console');
 
 /*app.listen(process.env.PORT || 3000,() => {​​
     console.log ( 'Application démarrée sur PORT $ {​​ process. env . PORT || 3000 }​​ ' ) ;
@@ -116,12 +115,15 @@ app.get('/Contacts',function (req,res) {
     });
 });
 
+var test;
+
 /*
 Effectuer les différentes réservations
 */
 app.get('/Reservation',function (req,res) {
-    
-    res.render('pages/reservation.ejs',{
+    test = req.params.prix; 
+    console.log(test);
+    res.render('pages/Reserver.ejs',{
         siteTitle : siteTitle,
         pageTitle : "Reserver un vol?"
     });
@@ -146,6 +148,7 @@ app.get('/Reservation/Reserver',function (req,res) {
         if (err) throw err;
         var dbo = db.db("db_airline_express");
         var query = { pays_origine: paysorigine, pays_destination: paysdestination};
+        console.log("result");
         dbo.collection("vol").find(query).toArray(function(err, result) {
           if (err) throw err;
           console.log(result);
@@ -225,11 +228,12 @@ app.use ( '/' , routeur ) ;
 Facture de la réservation
 */
 var num_vol;
-app.get('/Reservation/Facturation/:id',function (req,res) {
+app.get('/Reservation/Facturation',function (req,res) {
     /*
     Afficher tous les informations sur le vol à réserver
     */
-    num_vol = req.params.id;
+    num_vol = req.params;
+    console.log(num_vol);
     //let sql = "SELECT * FROM vol WHERE _id.toString() = '" + num_vol + "'";
     /*con.query(sql, function (err, result){
         res.render('pages/facture.ejs',{
@@ -289,40 +293,45 @@ app.get('/Reservation/Facturation/:id',function (req,res) {
 });*/
 
 
+//Creer un compte client
+app.get('/compte/creerclient',function (req,res) {
+    //res.end('Vous êtes à l\'accueil');
+    res.render('pages/creerclient.ejs',{
+        siteTitle : siteTitle,
+        pageTitle : "Pageclient"
+    });
+});
 
 //Déclaration des variables necessaires à la création du compte client 
 var nom;
 var prenom; 
+var addresse;
+var courriel;
+var password;
 /*
 Ajouter un client à la base de données 
 */
 app.post('/compte/creerclient',function (req,res) {
-
-    var query = "INSERT INTO client (prenom_client, nom_client, date_naissance, courriel) VALUES (";
-    query += " '"+req.body.prenom_client+"',";
-    query += " '"+req.body.nom_client+"',";
-    query += " '"+dateFormat(req.body.date_naissance,"yyyy-mm-dd")+"',";
-    query += " '"+req.body.courriel+"')";
-
     nom = req.body.nom_client;
     prenom = req.body.prenom_client;
+    addresse = req.body.addresse_client;
+    courriel = req.body.courriel_client;
+    password = req.body.password_client;
 
-    /*con.query(query, function (err, result){
+mongo.connect(url,function(err,db) {
+    if (err) throw err;
+    var dbo = db.db("db_airline_express");
+
+    clientcreation = {nom, prenom, addresse, courriel, password};
+    console.log(clientcreation);
+    dbo.collection("client").insertOne(clientcreation, function(err, res){
         if (err) throw err;
-        res.redirect(URLcpt);
-    });*/
-
-});
-
-//Creer un compte client
-app.get('/compte/creercompte',function (req,res) {
-    //res.end('Vous êtes à l\'accueil');
-    res.render('pages/creercompte.ejs',{
-        siteTitle : siteTitle,
-        pageTitle : "Pagecompte"
+        console.log("1 document inserted");
+        db.close();
     });
+    res.redirect("/");
+})
 });
-
 
 /*
 Ajouter un compte à la base de données
@@ -349,10 +358,3 @@ Ajouter un compte à la base de données
 
 });
 */
-
-
-
-
-
-
-

@@ -1,0 +1,96 @@
+<%- include ('../partials/header') %>
+    <style>
+        h1 {
+            padding: 14px 15px;
+            font-family: sans-serif;
+            text-align: center;
+        }
+
+        p {
+            font-family: sans-serif;
+            color: darkgrey;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        input {
+            padding: 15px 60px;
+            border-radius: 12px;
+            text-align: center;
+            margin-left: 35%;
+            margin-right: 50%;
+        }
+    </style>
+
+    <div class="">
+        <a href="/">
+            <img src="/images/logo.jpg" alt="Logo de l'application" style="margin-left:auto;margin-right:auto"></a>
+    </div>
+
+    <br>
+
+    <div class="">
+        <table class="menu">
+            <tr>
+                <th> <a href="/" class="btn btn-success btn-lg" style="color:White;text-decoration:none"> Accueil </a></th>
+                <th> <a href="/Reservation" class="btn btn-success btn-lg" style="color:White;text-decoration:none">Réservation</a></th>
+                <th> <a href="/Compte" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Compte</a> </th>
+                <th> <a href="/Contacts" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Nous Joindre </a> </th>
+            </tr>
+        </table>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <h1>Créer votre compte</h1>
+
+        <div class="row" style="margin-top:10px;margin-Left:50px;margin-right:50px">
+            <form action="http://localhost:5000/compte/creerclient" method="post" class="col s12">
+                <input type="hidden" name="e_id" value="" style="padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 35%;margin-right: 50%;">
+
+                <div class="form-group-row">
+                    <div class="col-10">
+                        <INPUT TYPE="text" NAME="nom_client" VALUE="Nom" class="form-control">
+                    </div>
+                </div>
+                <br>
+                <br>
+                <div class="form-group row">
+                    <div class="col-10">
+                        <INPUT TYPE="text" NAME="prenom_client" VALUE="Prénom" class="form-control" >
+                    </div>
+                </div>
+                <br>
+                <br>
+                <div class="form-group row">
+                    <div class="col-10">
+                        <INPUT TYPE="text" NAME="addresse" VALUE="Addresse" class="form-control">
+                    </div>
+                </div>
+                <br>
+                <br>
+                <hr>
+                <br>
+                <div class="form-group row">
+                    <div class="col-10">
+                        <INPUT TYPE="text" NAME="courriel" VALUE="nom@email.ca" class="form-control">
+                    </div>
+                </div>
+                <br>
+                <div class="form-group row">
+                    <div class="col-10">
+                        <INPUT TYPE="text" NAME="password" VALUE="password" class="form-control">
+                    </div>
+                <br>
+                <div class="form-group row">
+                    <div class="col-10">
+                        <input type="submit" name="submit"
+                            style="background-color: #1894db; color: white; padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 35%;margin-right: 50%;"
+                            value="Confirmer et Créer" class="btn btn-primary btn-lg">
+                    </div>
+                </div>
+            </form>
+
+<%- include ('../partials/footer') %>

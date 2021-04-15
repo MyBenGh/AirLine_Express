@@ -1,0 +1,99 @@
+<%- include ('../partials/header') %>
+<style>
+    button {
+        background-color: #1894db;
+        color: white;
+        padding: 14px 25px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        width: 20%;
+        border-radius: 12px;
+        text-align: center;
+        margin-left: 40%;
+        margin-right: 50%;
+    }
+
+    h1 {
+        padding: 14px 15px;
+        font-family: sans-serif;
+        text-align: center;
+    }
+
+    p {
+        font-family: sans-serif;
+        color: darkgrey;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    input {
+        padding: 15px 60px;
+        border-radius: 12px;
+        text-align: center;
+        margin-left: 37%;
+        margin-right: 50%;
+    }
+</style>
+
+
+    <div class="">
+        <a href="/">
+            <img src="/images/logo.jpg" alt="Logo de l'application" style="margin-left:auto;margin-right:auto"></a>
+    </div>
+    <br>
+
+    <div class="">
+        <table
+            style="background-color:Blue;color:White;font-size:30px;width:80%;height:70px;margin-left:auto;margin-right:auto">
+            <tr>
+                <th> <a href="/" class="btn btn-success btn-lg" style="color:White;text-decoration:none"> Accueil </a>
+                </th>
+                <th> <a href="/Reservation" class="btn btn-success btn-lg" style="color:White;text-decoration:none">
+                        Réservation</a></th>
+
+                <th style="text-decoration:underline">Compte</th>
+
+                <th> <a href="/Contacts" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Nous Joindre </a> </th>
+            </tr>
+        </table>
+    </div>
+    <br>
+    <br>
+    <br>
+    <h1>Ouvrir une session.</h1>
+    <br>
+    <form> 
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script>
+        $(document).ready(function(){
+            var email,pass;
+        $("#submit").click(function(){
+        email=$("#email").val();
+        
+        pass=$("#password").val();
+        /*
+        * Perform some validation here.
+        */
+        $.post("/login",{email:email,pass:pass},function(data){
+            if(data==='done') {
+                window.location.href="/Reservation/Reserver";
+            }
+        });
+    });
+    });
+    </script>
+    </head>
+    <body>
+    <input type="text" size="40" placeholder="Écrit votre username" id="email"><br />
+    <input type="password" size="40" placeholder="Écrit votre mot de passe" id="password"><br />
+    <input type="button" value="Submit" id="submit">
+    </body>
+
+    <center>
+        <a href="/compte/creerclient">
+        <h4>Vous avez deja un compte? Cliquez ici</h4></a>
+    </center>
+    </form>
+    
+    <%- include ('../partials/footer') %>
