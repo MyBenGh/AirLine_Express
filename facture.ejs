@@ -20,43 +20,52 @@
 
 <form action="http://localhost:5000/Reservation/Facture/<%= items[0]._id %>" method="post" class="col s12">
 
-     <div class="">
+    <div class="">
 	<div class="col s12">
         <% 
         if (items.length>0) {%>
-			<table class="table">
+			<table class="table" style = "width:50%;height:70px;background-color:AliceBlue;color:Black;font-size:30px;margin-left:auto;margin-right:auto">
 				<tbody>
                     
                     <% items.forEach(function(item,index){ %>
                         <tr>
-                            <th style="width:2%;font-size:25px;height:70px">ID </th>
-                            <td style="width:2%;font-size:20px"><%= index+1 %> </td>
-                        </tr>
-                        <tr>
-                            <th style="width:40%;font-size:25px;height:70px">Dates des vols</th>
-                            <td style="width:40%;font-size:20px"><%= item.date_vol %></td>
-                        </tr>
-                        <tr>
-                            <th style="width:10%;font-size:25px;height:70px">Sieges</th>
-                            <td style="width:10%;font-size:20px"><%= item.num_siege %></td>
-                        </tr>
-                        <tr>
-                            <th style="width:10%;font-size:25px;height:70px">Pays de départ</th>
+                            <th style="width:10%;font-size:25px;height:70px">Pays de départ: </th>
                             <td style="width:10%;font-size:20px;text-align:left"><%= item.pays_origine %></td>
                         </tr>
                         <tr>
-                            <th style="width:15%;font-size:25px;height:70px">Pays de destination</th>
+                            <th style="width:15%;font-size:25px;height:70px">Pays de destination: </th>
                             <td style="width:15%;font-size:20px;text-align:left"><%= item.pays_destination %></td>
                         </tr>
                         <tr>
-                            <th style="width:10%;font-size:25px;height:70px">Prix</th>
+                            <th style="width:40%;font-size:25px;height:70px">Dates du vol: </th>
+                            <td style="width:40%;font-size:20px"><%= item.date_vol %></td>
+                        </tr>
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">Siege: </th>
+                            <td style="width:10%;font-size:20px"><%= item.num_siege %></td>
+                        </tr>
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">SousTotal: </th>
                             <td style="width:10%;font-size:20px"><%= item.prix %>$</td>
                         </tr>
-
                         <tr>
-                            
+                            <th style="width:10%;font-size:25px;height:70px">TPS (5%): </th>
+                            <td style="width:10%;font-size:20px">
+                                <%= item.prix*0.05 %>$
+                            </td>
                         </tr>
-            
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">TVQ (9.975%): </th>
+                            <td style="width:10%;font-size:20px">
+                                <%= item.prix*0.09975 %>$
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Total: </th>
+                            <td style="width:10%;font-size:20px">
+                                <%= item.prix + (item.prix*0.05) + (item.prix*0.09975) %>$
+                            </td>
+                        </tr>
 
                     <%}); %>
 				</tbody>
@@ -65,8 +74,7 @@
             <button class="valider" style=" border-radius: 12px; ">Payer la réservation</button>
 
 		<% }else {%>
-			<p><strong> Pays d'origine et/ou pays de destination incorrect </strong></p>
-            <a href="/Reservation/Reserver" class="liaison_pages">Recommencer! </a>
+			<p><strong> Erreur </strong></p>
 		<% } %>
 	</div>
     <div/>                       
