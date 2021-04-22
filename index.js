@@ -16,6 +16,7 @@ const URLbase = "http://localhost:5000/";
 var db = monk('localhost:27017/db_airline_express');
 const URLreservation = "http://localhost:5000/Reservation/Reserver";
 const URLHistReservations = "http://localhost:5000/Reservation";
+const URLCompte = "http://localhost:5000/Compte";
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 module.exports = app;
@@ -49,6 +50,7 @@ app.use(express.static(__dirname + "/public"));
 // Avant, installer: npm i alert
 const alert = require('alert');
 const { debug, Console } = require('console');
+const { json } = require('body-parser');
 
 /*app.listen(process.env.PORT || 3000,() => {​​
     console.log ( 'Application démarrée sur PORT $ {​​ process. env . PORT || 3000 }​​ ' ) ;
@@ -140,34 +142,56 @@ app.get('/Reservation',function (req,res) {
         var query = { courriel: courriel, password: password};
         dbo.collection("Client").find(query).toArray(function(err, result) {
             if (err) throw err;
+            console.log(result);
             
-            dbo.collection('Reservation').aggregate([
-                { $lookup:
+            if(result.length > 0){
+                dbo.collection('Reservation').aggregate([
+                    //{$match: { "id_Client": result[0]._id } },
+                    { $lookup:
+                       {
+                        from: 'Vol',
+                         localField: 'id_Vol',
+                         foreignField: '_id',
+                         as: 'Vols'
+                       }
+                     },
+                     {
+                        $lookup:{
+                            from: "Client", 
+                            localField: "id_Client", 
+                            foreignField: "_id",
+                            as: "Clients"
+                        }
+                    },
                    {
-                     from: 'Client',
-                     localField: 'id_Client',
-                     foreignField: '_id',
-                     as: 'Clients'
-                   },
-                   $lookup:
-                   {
-                     from: 'Vol',
-                     localField: 'id_Vol',
-                     foreignField: '_id',
-                     as: 'Vols'
+                       $match:{
+                           $and:[{"id_Client" : result[0]._id}]
+                       }
                    }
-                 }
-                ]).toArray(function(err, resultat2) {
-                if (err) throw err;
-
+                    ]).toArray(function(err, resultat2) {
+                    if (err) throw err;
+                    console.log(JSON.stringify(resultat2));
+    
+                    if (resultat2.length > 0){
+                        res.render('pages/reservation.ejs',{
+                            siteTitle : siteTitle,
+                            pageTitle : "Historique des réservations",
+                            items : resultat2
+                        });
+                    }else{
+                        res.redirect(URLreservation)
+                    }
+                    
+                    db.close();
+                });
+            }else{
                 res.render('pages/reservation.ejs',{
                     siteTitle : siteTitle,
                     pageTitle : "Historique des réservations",
-                    items : resultat2
+                    items : result
                 });
-                
-                db.close();
-            });
+            }
+            
             db.close();
         });
     
@@ -254,6 +278,8 @@ routeur.get( '/Compte/Deconnexion' ,(req , res ) => {
         if ( err ) {
            console.log( err ) ;
         }
+        courriel = "";
+        password = "";
         res.redirect ( '/' ) ;
     } ) ;
 
@@ -298,17 +324,17 @@ app.post('/Reservation/Facture/:id',function (req,res) {
         if (err) throw err;
         var dbo = db.db("db_airline_express");
         var query = { courriel: courriel, password: password};
+
         dbo.collection("Client").find(query).toArray(function(err, result) {
             if (err) throw err;
-            num_Client =result[0]._id;
+            var InfosVol = { id_Client:result[0]._id, id_Vol: ObjectID(req.params.id), Date_Reservation: "2021-04-21" };
+            dbo.collection("Reservation").insertOne(InfosVol, function(err, res) {
+                if (err) throw err;
+                console.log("1 document inserted");
+                db.close();
+            });
             db.close();
         });
-        var InfosVol = { id_Client: ObjectID(num_Client), id_Vol: ObjectID(req.params.id), Date_Reservation: "2021-04-21" };
-        dbo.collection("Reservation").insertOne(InfosVol, function(err, res) {
-            if (err) throw err;
-            console.log("1 document inserted");
-            db.close();
-        }); 
     });
 
     res.redirect(URLbase);
