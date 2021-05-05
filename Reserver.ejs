@@ -1,0 +1,79 @@
+<%- include ('../partials/header') %>
+
+<div class="">
+        <img src="/Images_Appli/Logo.PNG" alt="Logo de l'application" style="margin-left:auto;margin-right:auto">
+    </div>
+    <br>
+
+<div class="">
+		<table style="background-color:Blue;color:White;font-size:30px;width:80%;height:70px;margin-left:auto;margin-right:auto">
+            <tr>
+                <th> <a href="/" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Accueil </a> </th>
+                <th style="text-decoration:underline">Réservation</th>
+                <th> <a href="/Compte" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Compte</a> </th>
+				<th > <a href="/Contacts" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Nous Joindre </a> </th>
+            </tr>
+		</table>
+	</div>
+<br>
+<br>
+
+<p style = 'Text-align:right'><a href="/Compte/Deconnexion" class="liaison_pages">Deconnexion</a></p>
+<p style = 'Text-align:right'><a href="/Compte/Miseajour" class="liaison_pages">Mise à jour</a></p>
+<br>
+<br>
+
+
+<form action="http://localhost:5000/Reservation/Reserver" method="post" class="col s12">
+    <label for="pays_origine" class ="col-2 col-form-label"> Pays de départ </label>
+    <INPUT TYPE="text" class="inputs" NAME="pays_origine" VALUE="pays">
+    <br>
+    <br>
+    <label for="pays_destination" class ="col-2 col-form-label"> Pays de destination </label>
+    <INPUT TYPE="text" class="inputs"  NAME="pays_destination" VALUE="pays">
+        
+    <br>
+    <button class="valider" style=" border-radius: 12px; ">Valider</button>
+</form>
+
+
+<div class="">
+    <br>
+    <h1>Résultat de la recherche!</h1>
+	<div class="col s12">
+        <% 
+        if (items.length>0) {%>
+			<table class="table" style = "width:80%;height:70px;background-color:AliceBlue;color:Black;font-size:30px;margin-left:auto;margin-right:auto">
+				<thead>
+				<tr>
+					<th style="width:2%;font-size:25px;height:70px">ID </th>
+					<th style="width:40%;font-size:25px;height:70px">Dates des vols</th>
+					<th style="width:10%;font-size:25px;height:70px">Sieges</th>
+					<th style="width:10%;font-size:25px;height:70px">Pays de départ</th>
+					<th style="width:15%;font-size:25px;height:70px">Pays de destination</th>
+					<th style="width:10%;font-size:25px;height:70px">Prix</th>
+                    <th style="width:10%;font-size:25px;height:70px">Actions</th>
+				</tr>
+				</thead>
+				<tbody>
+                    
+                    <% items.forEach(function(item,index){ %>
+                        <tr>
+                            <td style="width:2%;font-size:20px"><%= index+1 %> </td>
+                            <td style="width:40%;font-size:20px"><%= item.date_vol %></td>
+                            <td style="width:10%;font-size:20px"><%= item.num_siege %></td>
+						    <td style="width:10%;font-size:20px;text-align:left"><%= item.pays_origine %></td>
+						    <td style="width:15%;font-size:20px;text-align:left"><%= item.pays_destination %></td>
+						    <td style="width:10%;font-size:20px"><%= item.prix %>$</td>
+                            <td><a href="/Reservation/Facture/<%= item._id %>" class="btn btn-danger">Reserver </a></td>
+                        </tr>
+                    <%}); %>
+				</tbody>
+			</table>
+		<% }else {%>
+			<p><strong> Pays de départ ou de destination incorrects !! </strong></p>
+		<% } %>
+	</div>
+<div/>	
+
+<%- include ('../partials/footer') %>

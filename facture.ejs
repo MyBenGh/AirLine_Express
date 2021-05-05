@@ -1,0 +1,84 @@
+<%- include ('../partials/header') %>
+
+<div class="">
+	<img src="Images_Appli/logo.PNG" alt="Logo de l'application" style = "margin-left:auto;margin-right:auto">
+</div>
+<br>
+
+<div class="">
+		<table style="background-color:Blue;color:White;font-size:30px;width:80%;height:70px;margin-left:auto;margin-right:auto">
+            <tr>
+                <th> <a href="/" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Accueil </a> </th>
+                <th style="text-decoration:underline">Réservation</th>
+                <th> <a href="/Compte" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Compte</a> </th>
+				<th > <a href="/Contacts" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Nous Joindre </a> </th>
+            </tr>
+		</table>
+	</div>
+<br>
+
+
+<form action="http://localhost:5000/Reservation/Facture/<%= items[0]._id %>" method="post" class="col s12">
+
+    <div class="">
+	<div class="col s12">
+        <% 
+        if (items.length>0) {%>
+			<table class="table" style = "width:50%;height:70px;background-color:AliceBlue;color:Black;font-size:30px;margin-left:auto;margin-right:auto">
+				<tbody>
+                    
+                    <% items.forEach(function(item,index){ %>
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">Pays de départ: </th>
+                            <td style="width:10%;font-size:20px;text-align:left"><%= item.pays_origine %></td>
+                        </tr>
+                        <tr>
+                            <th style="width:15%;font-size:25px;height:70px">Pays de destination: </th>
+                            <td style="width:15%;font-size:20px;text-align:left"><%= item.pays_destination %></td>
+                        </tr>
+                        <tr>
+                            <th style="width:40%;font-size:25px;height:70px">Dates du vol: </th>
+                            <td style="width:40%;font-size:20px"><%= item.date_vol %></td>
+                        </tr>
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">Siege: </th>
+                            <td style="width:10%;font-size:20px"><%= item.num_siege %></td>
+                        </tr>
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">SousTotal: </th>
+                            <td style="width:10%;font-size:20px"><%= item.prix %>$</td>
+                        </tr>
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">TPS (5%): </th>
+                            <td style="width:10%;font-size:20px">
+                                <%= item.prix*0.05 %>$
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="width:10%;font-size:25px;height:70px">TVQ (9.975%): </th>
+                            <td style="width:10%;font-size:20px">
+                                <%= item.prix*0.09975 %>$
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Total: </th>
+                            <td style="width:10%;font-size:20px">
+                                <%= item.prix + (item.prix*0.05) + (item.prix*0.09975) %>$
+                            </td>
+                        </tr>
+
+                    <%}); %>
+				</tbody>
+			</table>
+
+            <button class="valider" style=" border-radius: 12px; ">Payer la réservation</button>
+
+		<% }else {%>
+			<p><strong> Erreur </strong></p>
+		<% } %>
+	</div>
+    <div/>                       
+                            
+</form>
+
+<%- include ('../partials/footer') %>
