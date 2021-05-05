@@ -1,0 +1,72 @@
+<%- include ('../partials/header') %>
+
+
+    <div class="">
+        <a href="/"><img src="/Images_Appli/Logo.PNG" alt="Logo de l'application"
+                style="margin-left:auto;margin-right:auto"></a>
+        <a href="/compte"><img src="/Images_Appli/team_hexa_user.jpg" style="float: right; width: 30px; height: 30px;"
+                alt="compte"></a>
+    </div>
+    <br>
+
+    <div class="">
+        <table
+            style="background-color:Blue;color:White;font-size:30px;width:80%;height:70px;margin-left:auto;margin-right:auto">
+            <tr>
+                <th> <a href="/" class="btn btn-success btn-lg" style="color:White;text-decoration:none"> Accueil </a>
+                </th>
+                <th style="text-decoration:none">Réservation</th>
+                <th> <a href="/Compte" class="btn btn-success btn-lg" style="color:White;text-decoration:underline">
+                        Compte</a> </th>
+                <th> <a href="/Contacts" class="btn btn-success btn-lg" style="color:White;text-decoration:none"> Nous
+                        Joindre </a> </th>
+            </tr>
+        </table>
+    </div>
+    <br>
+    <br>
+    <br>
+    <div class="">
+        <div class="col s12" style="margin-top:10px;margin-Left:50px;margin-right:50px">
+            <div action="http://localhost:5000/compte/update" method="post" class="col s12">
+                <input type="hidden" name="e_id" value=""
+                    style="padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 35%;margin-right: 50%;">
+                <form>
+                    <div class="form-group row">
+                        <div class="col-10">
+                            <label>Adresse courriel:</label>
+                            <INPUT TYPE="text"
+                                style="color: darkgrey; width: 35%; padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 35%;margin-right: 50%;"
+                                NAME="courriel" VALUE="<%= items[0].courriel %>" class="courriel">
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-group row">
+                        <div class="col-10">
+                            <label>Mot de passe: </label>
+                            <INPUT TYPE="text"
+                                style="color: darkgrey; width: 35%; padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 35%;margin-right: 50%;"
+                                NAME="password" VALUE="<%= items[0].password %>" class="password">
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="form-group row">
+                        <div class="col-10">
+                            <label> Adresse: </label>
+                            <INPUT TYPE="text"
+                                style="color: darkgrey; width: 35%; padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 35%;margin-right: 50%;"
+                                NAME="Adresse" VALUE="<%= items[0].adresse %>" class="adresse">
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+
+                    <input type="submit" class="btn btn-primary btn-lg"
+                        style="background-color: #1894db; color: white; padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 42.5%;margin-right: 50%;"
+                        value="Confirmer" id="submit">
+                </form>
+
+
+                <%- include ('../partials/footer') %>
