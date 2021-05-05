@@ -1,34 +1,44 @@
-const session = require ( 'express-session' ) ;
+const { debug, Console } = require('console');
 var cookieParser = require('cookie-parser');
+const session = require('express-session');
 const bodyParser = require('body-parser');
-const dateFormat = require('dateformat');
 var createError = require('http-errors');
-const express = require('express');
-swig = require('swig');
-mailer = require('express-mailer');
+const { json } = require('body-parser');
+var mailer = require('express-mailer');
 var nodemailer = require("nodemailer");
+const express = require('express');
 const routeur = express.Router();
 var logger = require('morgan');
 var mongo = require('mongodb');
+var alert = require('alert');
 var monk = require('monk');
-var con = require('mysql');
-var path = require('path');
-var mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-var uniqueValidator = require('mongoose-unique-validator');
+var swig = require('swig');
+const { stringify } = require('querystring');
+const ObjectID = mongo.ObjectID;
 const app = express();
-var logger = require('morgan');
+const now = new Date();
+
+
 const siteTitle = "Airline Express";
 var url = "mongodb+srv://db_airline_express:tp3@dbairlineexpress.zokt8.mongodb.net/db_airline_express?retryWrites=true&w=majority";
 const URLbase = "http://localhost:5000/";
 var db = monk('mongodb+srv://db_airline_express:tp3@dbairlineexpress.zokt8.mongodb.net/db_airline_express?retryWrites=true&w=majority');
-const URLcpt = "http://localhost:5000/compte/creercompte/";
 const URLreservation = "http://localhost:5000/Reservation/Reserver";
-
-app.use(bodyParser());
+const URLHistReservations = "http://localhost:5000/Reservation";
+const URLCompte = "http://localhost:5000/Compte";
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 module.exports = app;
+
+/**
+ * Variables permettant de mieux gerer Node Js
+ */
+var sess ;
+var courriel;
+var password;
+var paysorigine = "Canada";
+var paysdestination = "Mexique";
+
 
 
 app.set('view engine', 'ejs');
@@ -45,13 +55,6 @@ app.use ( express.static ( __dirname + '/views/pages' ) ) ;
 app.use(express.static(__dirname + "/public"));
 
 
-//Permet d'afficher les messages d'allerte
-// Avant, installer: npm i alert
-const alert = require('alert');
-const { debug, Console } = require('console');
-const { domainToASCII } = require('url');
-const { userInfo } = require('os');
-const { Recoverable } = require('repl');
 
 /*app.listen(process.env.PORT || 3000,() => {​​
     console.log ( 'Application démarrée sur PORT $ {​​ process. env . PORT || 3000 }​​ ' ) ;
@@ -81,6 +84,8 @@ app.use(function(req,res,next){
   });
 
 
+
+
 /*
 Page D'accueil: Explication du but de la compagnie
 */
@@ -90,45 +95,117 @@ app.get('/',function (req,res) {
         siteTitle : siteTitle,
         pageTitle : "Page d'accueil"
     });
+});
 
+
+
+/*
+Afficher la liste des vols
+*/
+app.get('/Vols',function (req,res) {
+    /*
+    Afficher tous les enrégistrements de la table vol
+    */
+    mongo.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("db_airline_express");
+        dbo.collection("vol").find().toArray(function(err, result) {
+          if (err) throw err;
+
+          //Affichage du résultat dans la page
+          res.render('pages/liste_vols.ejs',{
+            siteTitle : siteTitle,
+            pageTitle : "Liste des vols offerts",
+            items : result
+          });
+
+          db.close();
+       
+        });
+    });
 });
 
 /*
 Page De contact au cas où le client souhaite nous joindre
 */
 app.get('/Contacts',function (req,res) {
-    //res.end('Vous êtes à l\'accueil');
     res.render('pages/contact.ejs',{
         siteTitle : siteTitle,
         pageTitle : "Page de contact"
     });
 });
 
-var test;
-
 /*
-Effectuer les différentes réservations
+Consulter l'historique des réservations
 */
 app.get('/Reservation',function (req,res) {
-    test = req.params.prix; 
-    console.log(test);
-    res.render('pages/Reserver.ejs',{
-        siteTitle : siteTitle,
-        pageTitle : "Reserver un vol?"
+    
+    mongo.connect(url, function(err, db) { 
+        if (err) throw err;
+        var dbo = db.db("db_airline_express");
+        var query = { courriel: courriel, password: password};
+        dbo.collection("client").find(query).toArray(function(err, result) {
+            if (err) throw err;
+            
+            if(result.length > 0){
+                dbo.collection('reservation').aggregate([
+                    //{$match: { "id_Client": result[0]._id } },
+                    { $lookup:
+                       {
+                        from: 'vol',
+                         localField: 'id_Vol',
+                         foreignField: '_id',
+                         as: 'Vols'
+                       }
+                     },
+                     {
+                        $lookup:{
+                            from: "client", 
+                            localField: "id_Client", 
+                            foreignField: "_id",
+                            as: "Clients"
+                        }
+                    },
+                   {
+                       $match:{
+                           $and:[{"id_Client" : result[0]._id}]
+                       }
+                   }
+                    ]).toArray(function(err, resultat2) {
+                    if (err) throw err;
+                    console.log(JSON.stringify(resultat2));
+    
+                    if (resultat2.length > 0){
+                        res.render('pages/reservation.ejs',{
+                            siteTitle : siteTitle,
+                            pageTitle : "Historique des réservations",
+                            items : resultat2
+                        });
+                    }else{
+                        res.redirect(URLreservation)
+                    }
+                    
+                    db.close();
+                });
+            }else{
+                res.render('pages/reservation.ejs',{
+                    siteTitle : siteTitle,
+                    pageTitle : "Reservations",
+                    items : result
+                });
+            }
+            
+            db.close();
+        });
+    
     });
 });
 
 
 
 /*
-Réserver
+Choisir une vol à Réserver
 */
-/* 
-Variables
-*/
-var paysorigine = "Canada";
-var paysdestination = "Mexique";
-
 app.get('/Reservation/Reserver',function (req,res) {
     /*
     Afficher tous les enrégistrements de la table vol correspondants aux critères du client
@@ -137,10 +214,8 @@ app.get('/Reservation/Reserver',function (req,res) {
         if (err) throw err;
         var dbo = db.db("db_airline_express");
         var query = { pays_origine: paysorigine, pays_destination: paysdestination};
-        console.log("result");
         dbo.collection("vol").find(query).toArray(function(err, result) {
           if (err) throw err;
-          console.log(result);
 
           //Affichage du résultat dans la page
           res.render('pages/Reserver.ejs',{
@@ -162,25 +237,20 @@ app.post('/Reservation/Reserver',function (req,res) {
     /*
     Afficher tous les vols correspondant aux critères
     */
-
     paysorigine = req.body.pays_origine;
     paysdestination = req.body.pays_destination;
-
     res.redirect(URLreservation);
     
 });
 
 
 /*
-Connexion via u serveur en ligne
+Connexion via un serveur en ligne
  */
-
-var sess ; // session globale, NON recommandée
-
 routeur.get ( '/Compte' , ( req , res ) => {
     sess = req.session ;
     if ( sess.email ) {
-        return res.redirect (URLreservation) ;
+        return res.redirect (URLHistReservations) ;
     }
     //res.sendFile(__dirname + '/views/pages/compte.ejs');
     res.render('pages/compte.ejs',{
@@ -190,151 +260,199 @@ routeur.get ( '/Compte' , ( req , res ) => {
 } ) ;
 
 
-var email = "";
-var password = "";
-routeur.post ( '/login' , ( req , res ) => {
+/**
+ * Ouvre une session au client
+ */
+routeur.post ( '/Compte' , ( req , res ) => {
     sess = req.session ;
     sess.email = req.body.email ;
     res.end ( 'done' ) ;
 
-    email = req.body.email;
+    courriel = req.body.email;
     password = req.body.pass;
 } ) ;
-    
-routeur.get( '/compte/Deconnexion' ,(req , res ) => {
+
+
+/**
+ * Permet à un client de se déconnecter
+ */
+routeur.get( '/Compte/Deconnexion' ,(req , res ) => {
     req.session.destroy ( ( err ) => {
         if ( err ) {
            console.log( err ) ;
         }
+        courriel = "";
+        password = "";
         res.redirect ( '/' ) ;
     } ) ;
 
 } ) ;
 
-routeur.get ( '/compte/motdepasse' , ( req , res ) => {
-    sess = req.session ;
-    if ( sess.email ) {
-        return res.redirect (URLreservation) ;
-    }
-    res.render('pages/motdepasse.ejs',{
-        siteTitle : siteTitle,
-        pageTitle : "oublié",
-    });
-} ) ;
-
 app.use ( '/' , routeur ) ;
 
 /*
-Facture de la réservation
+Facture de la réservation 
 */
-var num_vol;
-app.get('/Reservation/Facturation',function (req,res) {
+app.get('/Reservation/Facture/:id',function (req,res) {
     /*
-    Afficher tous les informations sur le vol à réserver
+    Afficher toutes les informations sur le vol à réserver
     */
-    num_vol = req.params;
-    console.log(num_vol);
+    mongo.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("db_airline_express");
+        var query = { _id : ObjectID(req.params.id)};
+        dbo.collection("vol").find(query).toArray(function(err, result) {
+          if (err) throw err;
+          
+          //Affichage du résultat dans la page
+            res.render('pages/facture.ejs',{
+                siteTitle : siteTitle,
+                pageTitle : "Liste des vols à réserver",
+                items : result
+            });
+
+          db.close();
+       
+        });
+    });
 });
 
-//Creer un compte client
-app.get('/compte/creerclient',function (req,res) {
-    //res.end('Vous êtes à l\'accueil');
-    res.render('pages/creerclient.ejs',{
+
+
+// Enregistrer le vol dans la table facture
+app.post('/Reservation/Facture/:id',function (req,res) {
+    //Réserver le vol en question dans la table réserver
+    mongo.connect(url, function(err, db) {
+        if (err) throw err;
+        var mois = 1;
+        mois += now.getMonth();
+        var dbo = db.db("db_airline_express");
+        var query = { courriel: courriel, password: password};
+        let date_jour =  now.getFullYear() + "-" + mois + "-" + now.getDate() 
+                        + " " + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+
+        dbo.collection("client").find(query).toArray(function(err, result1) {
+            if (err) throw err;
+            var InfosVol = { id_Client:result1[0]._id, id_Vol: ObjectID(req.params.id), Date_Reservation: date_jour };
+            dbo.collection("reservation").insertOne(InfosVol, function(err, res) {
+                if (err) throw err;
+                db.close();
+            });
+
+            /**
+             * Envoyer par mail la facture du client
+            */
+            var query = { _id : ObjectID(req.params.id)};
+            dbo.collection("vol").find(query).toArray(function(err, result2) {
+                if (err) throw err;
+               
+                var tps = result2[0].prix * 0.05;
+                var tvq = result2[0].prix * 0.09975;
+                var montant = tps +tvq + result2[0].prix;
+                
+                var transporter = nodemailer.createTransport({
+                    service : 'gmail',
+                    host: 'smtp.gmail.com', // hostname
+                    auth: {
+                        user: 'airlineexpresstp3@gmail.com',
+                        pass: 'Livrable3'
+                    }
+                });
+
+                const mailOptions = {
+                    from: 'no-reply@example.com', // sender address
+                    to: courriel, // list of receivers
+                    subject: 'Facture du client', // Subject line
+                    html: `<p> Bonjour ${result1[0].nom}, ${result1[0].prenom}</p>
+                           <h1>Informations sur le vol réservé:</h1>
+                           <p>Pays d'origine: ${result2[0].pays_origine}; </p>
+                           <p>Pays de destination: ${result2[0].pays_destination}</p>
+                           <p>Siège: ${result2[0].num_siege}</p>
+                           <p>Date: ${result2[0].date_vol}</p>
+                           <p>Sous Total: ${result2[0].prix}$</p><hr>
+                           <p>TPS (5%): ${tps}$</p>
+                           <p>TVQ (9.975%): ${tvq}$</p>
+                           <p>Montant final: ${montant}$</p><hr>
+                           <h1>Merci de nous faire confiance!</h1>`,
+                    text: 'mail envoyé!'
+                };
+
+                transporter.sendMail(mailOptions, function (err, info) {
+                    if(err){
+                        console.log(err);
+                        alert('Courriel incorrect ou inexistant; Veillez réessayer!');
+                    }
+                    else{
+                        alert('Vous recevrez votre facture par courriel!');
+                        console.log(info.response);
+                    } 
+                });
+     
+               db.close();
+            });
+
+            db.close();
+            
+        });
+    });
+
+    res.redirect(URLbase);
+});
+
+
+/**
+ * Permet de créer un compte client
+ */
+app.get('/Compte/CreerCompte',function (req,res) {
+    res.render('pages/creercompte.ejs',{
         siteTitle : siteTitle,
         pageTitle : "Pageclient"
     });
 });
 
-//Déclaration des variables necessaires à la création du compte client 
-var nom;
-var prenom; 
-var addresse;
-var courriel;
-var password;
 /*
-Ajouter un client à la base de données 
+Ajouter un compte à la base de données
 */
-app.post('/compte/creerclient', function (req,res) {
+app.post('/Compte/CreerCompte',function (req,res) {
 
-    var nomUser = req.body.nom_client;
-    var prenomUser = req.body.prenom_client;
-    var addresseUser = req.body.addresse_client;
-    var username = req.body.courriel_client;
-    var passwordUser = req.body.password_client;
-
-    mongo.connect(url,function(err,db) {
+    var nom = req.body.nom_client;
+    var prenom = req.body.prenom_client;
+    var adresse = req.body.adresse;
+    courriel = req.body.courriel;
+    password = req.body.mot_de_passe;
+    //Enrégistrer les données du client dans la base de données
+    mongo.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("db_airline_express");
-
-        dbo.collection("client").find({courriel : username}).toArray(function(err,result){
-            if(result[0].courriel === username){
-                console.log("Le courriel existe deja.");
-                db.close();
-                res.redirect("/");
-
-    }else{
-
-        if (err) throw err;
-        var dbo = db.db("db_airline_express");
-
-        clientcreation = {nomUser, prenomUser, addresseUser, courrielUser, passwordUser};
-        console.log(clientcreation);
+        clientcreation = {nom, prenom, adresse, courriel, password};
+        console.log(clientcreation)
+        
         dbo.collection("client").insertOne(clientcreation, function(err, res){
             if (err) throw err;
             console.log("1 document inserted");
             db.close();
-        });
-        res.redirect("/");
-        }
-        });
-       
-            
+        }); 
+    });
+
+    res.redirect(URLreservation);
+
 });
-})
 
-app.post( '/compte/motdepasse', function(req, res){
 
-    var username = req.body.courriel_client;
-
-       mongo.connect(url,function(err,db) {
-        if (err) throw err;
-        var dbo = db.db("db_airline_express");
-
-        dbo.collection("client").find({courriel : username}).toArray(function(err,result){
-            if(result[0].courriel === username){
-                console.log("in");
-
-                var transporter = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: 'airlineexpresstp3@gmail.com  ',
-                        pass: 'Livrable3'
-                    }
-                   });
-        
-                   const mailOptions = {
-                    from: 'airlineexpresstp3@gmail.com  ', // sender address
-                    to: username, // list of receivers
-                    subject: 'Mot de passe oublié', // Subject line
-                    html: '<p>Bonjour, ' + prenom  + '</p> <br> <p> Votre mot de passe est : ' + 
-                    password// plain text body
-                  };
-                
-                  transporter.sendMail(mailOptions, function (err, info) {
-                    if(err)
-                        alert("Courriel pas envoyé");
-                    else
-                        alert("Courriel envoyé");
-                      res.redirect('/');
-                    
-                 });
-
-            }
-            else{
-                console.log("Courriel non trouver");
-                res.redirect('..');
-            }
-        db.close();
+/**
+ * Mise à jour du mot de passe client
+ */
+app.get('/Compte/Reinitialisermdp',function (req,res) {
+    //res.end('Vous êtes à l\'accueil');
+    res.render('pages/ReinitialiserMdp.ejs',{
+        siteTitle : siteTitle,
+        pageTitle : "PageUpdate"
+    });
 });
-})
-});
+
+
+
+
+
+
+
