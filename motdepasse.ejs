@@ -1,0 +1,72 @@
+<%- include ('../partials/header') %>
+<style>
+    button {
+        background-color: #1894db;
+        color: white;
+        padding: 14px 25px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        width: 20%;
+        border-radius: 12px;
+        text-align: center;
+        margin-left: 40%;
+        margin-right: 50%;
+    }
+
+    h1 {
+        padding: 14px 15px;
+        font-family: sans-serif;
+        text-align: center;
+    }
+
+    p {
+        font-family: sans-serif;
+        color: darkgrey;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    input {
+        padding: 15px 60px;
+        border-radius: 12px;
+        text-align: center;
+        margin-left: 37%;
+        margin-right: 50%;
+    }
+</style>
+
+<div class="">
+	<a href="/">
+        <img src="/images/logo.jpg" alt="Logo de l'application" style="margin-left:auto;margin-right:auto"></a>
+</div>
+<br>
+
+<div class="">
+		<table class="menu">
+            <tr>
+                <th style="text-decoration:underline">Accueil</th>
+                <th> <a href="/Reservation/Reserver" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Réservation</a></th>
+                <th> <a href="/Compte" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Compte</a> </th>
+				<th> <a href="/Contacts" class="btn btn-success btn-lg" style = "color:White;text-decoration:none"> Nous Joindre </a> </th>
+            </tr>
+		</table>
+	</div>
+<br>
+
+<body>
+    <h1>Mot de passe oublié</h1>
+<center>
+    <h5>Écrivez votre username / courriel</h5>
+    <form action="http://localhost:5000/compte/motdepasse" method="post" class="col s12">
+        <INPUT TYPE="text" NAME="courriel_client" VALUE="nom@email.com" class="form-control"><br />
+        <br>
+        <input type="submit" name="submit"
+                            style="background-color: #1894db; color: white; padding: 15px 60px; border-radius: 12px; text-align: center;margin-left: 35%;margin-right: 50%;"
+                            value="Confirmer" class="btn btn-primary btn-lg">
+    
+    </form>
+</center>
+</body>
+
+<%- include ('../partials/footer') %>
